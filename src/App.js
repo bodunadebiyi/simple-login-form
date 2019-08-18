@@ -7,7 +7,7 @@ import Input from './components/Input';
 const styles = {
   app: {
     width: '90%',
-    maxWidth: 300,
+    maxWidth: 350,
     padding: 20,
     borderStyle: 'solid',
     borderRadius: 3,
@@ -17,6 +17,7 @@ const styles = {
     position: 'relative',
     top: '50%',
     transform: 'translateY(-50%)',
+    boxSizing: 'border-box'
   },
   submitButton: {
     width: '100%',
@@ -50,6 +51,16 @@ class App extends React.Component {
     this.setState({ passwordStrength: score })
   }
 
+  getErrorId = errorMessage => {
+    if (/password/i.test(errorMessage)) {
+      return 'pw_desc_err';
+    } 
+
+    if (/email/i.test(errorMessage)) {
+      return 'em_desc_err';
+    }
+  }
+
   onInputChange = type => e => {
     if (type === 'password') this.runPasswordValidator(e.target.value);
     this.setState({ [type]: e.target.value })
@@ -61,7 +72,9 @@ class App extends React.Component {
 
     if (!email) {
       errors.push('Email is required.');
-    } else if (!password) {
+    }
+  
+    if (!password) {
       errors.push('password is required.');
     } else if (passwordStrength === 2) {
       errors.push('password is weak.')
@@ -75,9 +88,9 @@ class App extends React.Component {
   submitForm = e => {
     e.preventDefault();
     const errors = this.getFormErrors();
-    this.setState({ errors }, () => {
-      if (!errors.length) alert('Registration complete');
-    });
+    this.setState({ errors });
+
+    if (!errors.length) alert('Registration complete');
   }
 
   render() {
@@ -93,7 +106,7 @@ class App extends React.Component {
     return (
       <div className={classes.app}>
         {hasErrors && <div className={classes.errors}>
-          <ul>{errors.map(error => <li>{error}</li>)}</ul>
+          <ul>{errors.map((error, i) => <li id={this.getErrorId(error)} key={i}>{error}</li>)}</ul>
         </div>}
         <form onSubmit={this.submitForm}>
           <Input
@@ -104,6 +117,7 @@ class App extends React.Component {
               id: 'my_email',
               value: email,
               onChange: this.onInputChange('email'),
+              'aria-describedby': 'em_desc_err'
             }} />
           <Input
             label="Password"
@@ -113,12 +127,10 @@ class App extends React.Component {
               id: 'my_password',
               value: password,
               onChange: this.onInputChange('password'),
+              'aria-describedby': 'pw_desc_err'
             }} />
           <PasswordStrengthIndicator strength={passwordStrength} />
-          <button
-            className={classes.submitButton}
-            type="submit"
-          >
+          <button className={classes.submitButton} type="submit">
             Submit
           </button>
         </form>
