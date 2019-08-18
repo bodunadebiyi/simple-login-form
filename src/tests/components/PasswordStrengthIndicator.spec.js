@@ -24,11 +24,11 @@ describe('PasswordStrengthIndicator', () => {
     });
   });
 
-  describe('when password strength is 1', () => {
+  describe('when password strength is 2', () => {
     let component;
     
     beforeEach(() => {
-      component = shallow(<PasswordStrengthIndicator strength={1} />);
+      component = shallow(<PasswordStrengthIndicator strength={2} />);
     });
 
     it('displays a password verdict of "Weak"', () => {
@@ -42,11 +42,11 @@ describe('PasswordStrengthIndicator', () => {
     })
   });
 
-  describe('when password strength is 2', () => {
+  describe('when password strength is 3', () => {
     let component;
     
     beforeEach(() => {
-      component = shallow(<PasswordStrengthIndicator strength={2} />);
+      component = shallow(<PasswordStrengthIndicator strength={3} />);
     });
 
     it('displays a password verdict of "Good"', () => {
@@ -60,11 +60,11 @@ describe('PasswordStrengthIndicator', () => {
     })
   });
 
-  describe('when password strength is 3', () => {
+  describe('when password strength is 4', () => {
     let component;
     
     beforeEach(() => {
-      component = shallow(<PasswordStrengthIndicator strength={3} />);
+      component = shallow(<PasswordStrengthIndicator strength={4} />);
     });
 
     it('displays a password verdict of "VeryGood"', () => {

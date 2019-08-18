@@ -48,9 +48,9 @@ const styles = {
 
 const passwordStrength = {
   INVALID: 0,
-  WEAK: 1,
-  GOOD: 2,
-  VERY_GOOD: 3
+  WEAK: 2,
+  GOOD: 3,
+  VERY_GOOD: 4
 };
 
 const PasswordStrengthIndicator = React.memo(({
@@ -77,8 +77,7 @@ const PasswordStrengthIndicator = React.memo(({
       barStyle += classes.passwordIsVeryGood;
       break;
     default:
-      passwordVerdict = '';
-      barStyle += classes.invalidBar;
+      passwordVerdict = 'Invalid';
   }
 
   return (
@@ -96,7 +95,7 @@ const PasswordStrengthIndicator = React.memo(({
 });
 
 PasswordStrengthIndicator.defaultProps = {
-  strength: 3
+  strength: 0
 };
 
 PasswordStrengthIndicator.props = {

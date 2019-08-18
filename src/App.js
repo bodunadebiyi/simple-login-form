@@ -1,7 +1,8 @@
 import React from 'react';
+import injectSheet from 'react-jss';
+import passwordChecker from 'zxcvbn';
 import PasswordStrengthIndicator from './components/PasswordStrengthIndicator';
 import Input from './components/Input';
-import injectSheet from 'react-jss';
 
 const styles = {
   app: {
@@ -25,54 +26,102 @@ const styles = {
     fontSize: 14,
     border: 'none',
     marginTop: 60
+  },
+  errors: {
+    borderColor: 'red',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    padding: 5,
+    fontSize: 12,
+    marginBottom: 20
   }
 }
 
 class App extends React.Component {
   state = {
     email: '',
-    password: ''
+    password: '',
+    passwordStrength: 0,
+    errors: [],
+  }
+
+  runPasswordValidator = password => {
+    const { score } = passwordChecker(password);
+    this.setState({ passwordStrength: score })
   }
 
   onInputChange = type => e => {
+    if (type === 'password') this.runPasswordValidator(e.target.value);
     this.setState({ [type]: e.target.value })
+  }
+
+  getFormErrors = () => {
+    const errors = [];
+    const { email, password, passwordStrength } = this.state;
+
+    if (!email) {
+      errors.push('Email is required.');
+    } else if (!password) {
+      errors.push('password is required.');
+    } else if (passwordStrength === 2) {
+      errors.push('password is weak.')
+    } else if (passwordStrength < 2) {
+      errors.push('password is invalid.');
+    }
+
+    return errors;
+  }
+
+  submitForm = e => {
+    e.preventDefault();
+    const errors = this.getFormErrors();
+    this.setState({ errors }, () => {
+      if (!errors.length) alert('Registration complete');
+    });
   }
 
   render() {
     const { classes } = this.props;
-    const { email, password } = this.props;
+    const {
+      email,
+      password,
+      passwordStrength,
+      errors
+    } = this.state;
+    const hasErrors = !!errors.length;
 
     return (
       <div className={classes.app}>
-        <div className={classes.appBody}>
-          <form>
-            <Input
-              label="Email"
-              inputProps={{
-                name: 'email',
-                type: 'email',
-                id: 'my_email',
-                value: email,
-                onChange: this.onInputChange('email'),
-              }} />
-            <Input
-              label="Password"
-              inputProps={{
-                name: 'password',
-                type: 'password',
-                id: 'my_password',
-                value: password,
-                onChange: this.onInputChange('password'),
-              }} />
-            <PasswordStrengthIndicator strength={0} />
-            <button
-              className={classes.submitButton}
-              type="submit"
-            >
-              Submit
-            </button>
-          </form>
-        </div>
+        {hasErrors && <div className={classes.errors}>
+          <ul>{errors.map(error => <li>{error}</li>)}</ul>
+        </div>}
+        <form onSubmit={this.submitForm}>
+          <Input
+            label="Email"
+            inputProps={{
+              name: 'email',
+              type: 'email',
+              id: 'my_email',
+              value: email,
+              onChange: this.onInputChange('email'),
+            }} />
+          <Input
+            label="Password"
+            inputProps={{
+              name: 'password',
+              type: 'password',
+              id: 'my_password',
+              value: password,
+              onChange: this.onInputChange('password'),
+            }} />
+          <PasswordStrengthIndicator strength={passwordStrength} />
+          <button
+            className={classes.submitButton}
+            type="submit"
+          >
+            Submit
+          </button>
+        </form>
       </div>
     );
   }
